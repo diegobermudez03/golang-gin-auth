@@ -7,7 +7,7 @@ import (
 
 func AuthRoutes() chi.Router{
 	r := chi.NewRouter()
-	r.Get("/signup", controller.Signup)
+	r.Post("/signup", controller.Signup)
 	r.Post("/login", controller.Login)
 	return r
 }

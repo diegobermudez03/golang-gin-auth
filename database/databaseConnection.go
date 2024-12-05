@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-
 	_ "github.com/lib/pq"
 )
 
@@ -17,14 +16,16 @@ func init(){
 	err := godotenv.Load(".env")
 	if err != nil{
 		log.Fatal("Error loading .env file")
+		return
 	}
+	fmt.Println("ENV variables loaded")
 
 	conString := os.Getenv("POSTGRES_URL") 
 	fmt.Printf("Connecting to postgres on %s\n", conString)
 	
 	Db, err = sql.Open("postgres", conString)
-	err = Db.Ping()
-	if err != nil{
+
+	if err = Db.Ping(); err != nil{
 		log.Fatal(err)
 	}
 
