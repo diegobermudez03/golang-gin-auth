@@ -123,7 +123,37 @@ func Login(w http.ResponseWriter, r *http.Request){
 
 
 func GetUsers(w http.ResponseWriter, r *http.Request){
+	offset := 0
+	limit := 10
+	if aux := r.URL.Query().Get("offset"); aux != ""{
+		offset, _ = strconv.Atoi(aux)
+	}
+	if aux := r.URL.Query().Get("limit"); aux != ""{
+		limit, _ = strconv.Atoi(aux)
+	}
 
+	w.Header().Set("Content-Type", "application/json")
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second*10)
+	defer cancel()
+	rows, err := database.Db.QueryContext(ctx, "SELECT * FROM users OFFSET $1 LIMIT $2", offset, limit)
+	if err != nil{
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+	}
+
+	users := []models.User{}
+
+	for rows.Next(){
+		var user models.User
+		err = rows.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Password, &user.Email, 
+			&user.Phone, &user.Token, &user.UserType, &user.RefreshToken, &user.CreatedAt, &user.UpdatedAt)
+		
+		if err == nil{
+			users = append(users, user)
+		}
+	}
+
+	json.NewEncoder(w).Encode(users)
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request){

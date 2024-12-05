@@ -67,6 +67,9 @@ func GenerateAllTokens(email string, id int, firstName string, lastName string, 
 
 
 func ValidateToken(tokenStr string) bool {
+	if tokenStr == ""{
+		return false
+	}
 	claims := &CustomClaims{}
 	tokenStr = strings.Split(tokenStr," ")[1]
 
