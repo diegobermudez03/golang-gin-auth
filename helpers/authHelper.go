@@ -6,7 +6,7 @@ import (
 	"github.com/diegobermudez03/golang-jwt-auth/models"
 )
 
-func MatchUserTypeToUID(user models.User, userId string) error {
+func MatchUserTypeToUID(user models.User, userId int) error {
 	if user.UserType == "USER" && user.ID != userId{
 		err := errors.New("Unathorized to access this resource")
 		return err 

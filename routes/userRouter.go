@@ -9,7 +9,7 @@ import (
 func UserRoutes() chi.Router{
 	r := chi.NewRouter()
 	r.Use(middlewares.AuthMiddleware)
-	r.Get("/", controller.GetUser)
-	r.Get("/{user_id}", controller.GetUsers)
+	r.Get("/", controller.GetUsers)
+	r.Get("/{user_id}", controller.GetUser)
 	return r
 }

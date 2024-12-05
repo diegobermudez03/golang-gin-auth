@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -14,7 +15,8 @@ import (
 
 func main() {
 	defer database.Db.Close()
-	
+	defer fmt.Println("closing database")
+
 	port := os.Getenv("PORT")
 
 	if port == ""{
@@ -23,9 +25,14 @@ func main() {
 
 	router := chi.NewRouter()
 
+	router.Use(cors.Handler(cors.Options{
+		AllowedOrigins: 	[]string{"*"},
+		AllowedMethods:		[]string{"GET", "POST", "PUT", "DELETE"},
+	}))
+
 	//mounting routes
-	router.Mount("users", routes.AuthRoutes())
-	router.Mount("users", routes.UserRoutes())
+	router.Mount("/users/auth", routes.AuthRoutes())
+	router.Mount("/users", routes.UserRoutes())
 
 	//health check
 	router.Get("/api-1", func(w http.ResponseWriter, r *http.Request){
@@ -43,11 +50,6 @@ func main() {
 			"success": "Access granted for api 2",
 		})
 	})
-
-	router.Use(cors.Handler(cors.Options{
-		AllowedOrigins: 	[]string{"*"},
-		AllowedMethods:		[]string{"GET", "POST", "PUT", "DELETE"},
-	}))
 
 	srv := &http.Server{
 		Handler: router,

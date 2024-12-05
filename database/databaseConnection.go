@@ -7,6 +7,8 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+
+	_ "github.com/lib/pq"
 )
 
 var Db *sql.DB
@@ -18,10 +20,13 @@ func init(){
 	}
 
 	conString := os.Getenv("POSTGRES_URL") 
+	fmt.Printf("Connecting to postgres on %s\n", conString)
+	
 	Db, err = sql.Open("postgres", conString)
-
+	err = Db.Ping()
 	if err != nil{
 		log.Fatal(err)
 	}
+
 	fmt.Println("Connected to Postgresql")
 }
