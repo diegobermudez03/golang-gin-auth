@@ -6,7 +6,9 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/diegobermudez03/golang-jwt-auth/routes"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 )
 
 func main() {
@@ -18,8 +20,11 @@ func main() {
 
 	router := chi.NewRouter()
 
-	//
+	//mounting routes
+	router.Mount("users", routes.AuthRoutes())
+	router.Mount("users", routes.UserRoutes())
 
+	//health check
 	router.Get("/api-1", func(w http.ResponseWriter, r *http.Request){
 		w.WriteHeader(http.StatusAccepted)
 		w.Header().Set("Content-Type", "application/json")
@@ -28,7 +33,6 @@ func main() {
 		})
 	})
 
-
 	router.Get("/api-2", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusAccepted)
 		w.Header().Set("Content-Type", "application/json")
@@ -36,6 +40,11 @@ func main() {
 			"success": "Access granted for api 2",
 		})
 	})
+
+	router.Use(cors.Handler(cors.Options{
+		AllowedOrigins: 	[]string{"*"},
+		AllowedMethods:		[]string{"GET", "POST", "PUT", "DELETE"},
+	}))
 
 	srv := &http.Server{
 		Handler: router,
