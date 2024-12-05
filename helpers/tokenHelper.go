@@ -1,19 +1,15 @@
 package helper
 
 import (
+	"fmt"
 	"os"
+	"strings"
 	"time"
+
+	"log"
 
 	"github.com/golang-jwt/jwt/v5"
 )
-
-type userClaims struct{
-	id int
-	email string
-	firstName string 
-	lastName string 
-	jwt.RegisteredClaims
-}
 
 var secretKey string 
 
@@ -67,4 +63,29 @@ func GenerateAllTokens(email string, id int, firstName string, lastName string, 
 	stringRefreshToken, err = refreshToken.SignedString([]byte(secretKey))
 
 	return stringToken, stringRefreshToken, err
+}
+
+
+func ValidateToken(tokenStr string) bool {
+	claims := &CustomClaims{}
+	tokenStr = strings.Split(tokenStr," ")[1]
+
+	token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token)(interface{}, error){
+		return []byte(secretKey), nil
+	})
+
+	if err != nil{
+		log.Println(err)
+		return false
+	}
+
+	if !token.Valid{
+
+		return false
+	}
+
+	if claims.ExpiresAt.Time.Before(time.Now()){
+		fmt.Println("Expired token")
+	}
+	return true
 }
