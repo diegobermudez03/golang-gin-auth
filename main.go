@@ -6,12 +6,15 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/diegobermudez03/golang-jwt-auth/database"
 	"github.com/diegobermudez03/golang-jwt-auth/routes"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 )
 
 func main() {
+	defer database.Db.Close()
+	
 	port := os.Getenv("PORT")
 
 	if port == ""{
